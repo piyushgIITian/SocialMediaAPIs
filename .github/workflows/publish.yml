@@ -8,6 +8,6 @@ jobs:
   - uses: actions/checkout@v2
   - name: Build the reunion Docker image
     run: |
-        echo $CR_PAT | docker pull piyushgautamtg/reunion
+        echo $CR_PAT | docker login ghcr.io -u piyushgiitian --password-stdin
     env:
       CR_PAT: ${{ secrets.CR_PAT }}
