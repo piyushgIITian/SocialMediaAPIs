@@ -1,3 +1,11 @@
+<aside>
+ This repository is a implementation of Various Social Media APIs .
+</aside>
+
+### **Stacks**
+
+- Backend: NodeJS (using ExpressJS or Koa) or Python (using Django). Use other helping libraries.
+- Database: PostgreSQL or MongoDB
 
 
 ### **API Endpoints**
@@ -6,10 +14,7 @@
     - INPUT: Email, Password
     - RETURN: JWT token
     
-    <aside>
-    ➡️ This repository is a implementation of Various **Social Media APIs**.
     
-    </aside>
     
 - POST /api/follow/{id} authenticated user would follow user with {id}
 - POST /api/unfollow/{id} authenticated user would unfollow a user with {id}
