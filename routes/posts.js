@@ -3,9 +3,11 @@ const router = express.Router()
 const Post = require("../models/Post");
 // const User = require("../models/User");
 const auth = require("../middleware/auth");
-//create a post
 
+
+//create a post
 router.post("/", auth, async (req, res) => {
+
   const newPost = new Post({
     title: req.body.title,
     desc: req.body.description,

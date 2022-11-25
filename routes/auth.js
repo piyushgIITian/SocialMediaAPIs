@@ -2,11 +2,11 @@ const express = require('express')
 const router = express.Router()
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-
+const jwt = require("jsonwebtoken");
 
 router.post("/register", async (req, res) => {
-    console.log(req.body)
-    try {
+  try {
+      console.log(req.body)
         
       //generate new password
       const salt = await bcrypt.genSalt(10);
@@ -52,7 +52,7 @@ router.post("/", async (req, res) => {
         );
   
         user.token = token;
-        res.status(200).json(user);
+        res.status(200).json(token);
       }
       res.status(400).send("Invalid Credentials");
     } catch (err) {

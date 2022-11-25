@@ -1,15 +1,16 @@
-const User = require("../models/User");
 const express = require('express')
-const router = express.Router()
 const auth = require("../middleware/auth");
+const User = require("../models/User");
+const Post = require("../models/Post");
+const router = express.Router()
 
 
 
 
 //get a user
-router.get("/user/:id",auth, async (req, res) => {
+router.get("/user", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.body.id);
     const { username,followers,following } = user._doc;
     res.status(200).json({username,followers,following});
   } catch (err) {
@@ -20,22 +21,26 @@ router.get("/user/:id",auth, async (req, res) => {
 
 //like / dislike a post
 
-router.put("/like/:id",auth, async (req, res) => {
+router.post("/like/:id",auth, async (req, res) => {
     try {
+      
       const post = await Post.findById(req.params.id);
-      if (!post.likes.includes(req.body.userId)) {
-        await post.updateOne({ $push: { likes: req.body.userId } });
+      console.log("this worked")
+      if (!post.likes.includes(req.body.id)) {
+        
+        await post.updateOne({ $push: { likes: req.body.id } });
         res.status(200).json("The post has been liked");
       } 
     } catch (err) {
+      
       res.status(500).json(err);
     }
   });
   router.put("/unlike/:id",auth, async (req, res) => {
       try {
         const post = await Post.findById(req.params.id);
-        if (post.likes.includes(req.body.userId)){
-          await post.updateOne({ $pull: { likes: req.body.userId } });
+        if (post.likes.includes(req.body.id)){
+          await post.updateOne({ $pull: { likes: req.body.id } });
           res.status(200).json("The post has been disliked");
         }
       } catch (err) {
@@ -48,10 +53,9 @@ router.put("/like/:id",auth, async (req, res) => {
   router.post("/comment/:id",auth, async (req, res) => {
       try{
           const post = await Post.findById(req.params.id);
-          if (post.userId === req.body.userId) {
-              await post.updateOne({$push:{comments: req.body.comments}})
-              res.status(200).json("comment posted successfully");
-            }
+          await post.updateOne({$push:{comments: req.body.comment}})
+          res.status(200).json(`comment posted successfully with comment-id ${post.comments.length+1}`);
+          
           } 
       catch (err) {
             res.status(500).json(err);
@@ -63,13 +67,15 @@ router.put("/like/:id",auth, async (req, res) => {
 
 //follow a user
 
-router.put("/follow/:id",auth, async (req, res) => {
-  if (req.body.userId !== req.params.id) {
+router.post("/follow/:id",auth, async (req, res) => {
+  console.log(req);
+  if (req.body.id !== req.params.id) {
     try {
+      console.log("this worked")
       const user = await User.findById(req.params.id);
-      const currentUser = await User.findById(req.body.userId);
-      if (!user.followers.includes(req.body.userId)) {
-        await user.updateOne({ $push: { followers: req.body.userId } });
+      const currentUser = await User.findById(req.body.id);
+      if (!user.followers.includes(req.body.id)) {
+        await user.updateOne({ $push: { followers: req.body.id } });
         await currentUser.updateOne({ $push: { followings: req.params.id } });
         res.status(200).json("user has been followed");
       } else {
@@ -79,13 +85,14 @@ router.put("/follow/:id",auth, async (req, res) => {
       res.status(500).json(err);
     }
   } else {
+    console.log("this worked aa")
     res.status(403).json("you cant follow yourself");
   }
 });
 
 //unfollow a user
 
-router.put("/unfollow/:id",auth, async (req, res) => {
+router.post("/unfollow/:id",auth, async (req, res) => {
     if (req.body.userId !== req.params.id) {
       try {
         const user = await User.findById(req.params.id);
@@ -105,12 +112,23 @@ router.put("/unfollow/:id",auth, async (req, res) => {
     }
   });
 
+
+//get post
+router.get("/posts/:id", async (req, res) => {
+  try{
+    const post=await Post.findById(req.params.id);
+    res.json(post);
+  }catch(err){
+    res.status(500).json(err);
+  }});
+
 //get timeline posts
 
 router.get("/all_posts",auth, async (req, res) => {
     try {
-      const currentUser = await User.findById(req.body.userId);
+      const currentUser = await User.findById(req.body.id);
       const userPosts = await Post.find({ userId: currentUser._id });
+      console.log(currentUser)
       const friendPosts = await Promise.all(
         currentUser.followings.map((friendId) => {
           return Post.find({ userId: friendId });

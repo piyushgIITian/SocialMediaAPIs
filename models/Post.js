@@ -2,10 +2,7 @@ const mongoose = require("mongoose");
 
 const PostSchema = new mongoose.Schema(
   {
-    userId: {
-      type: String,
-      required: true,
-    },
+
     title:{
         type: String,
         max: 200,
@@ -15,8 +12,8 @@ const PostSchema = new mongoose.Schema(
         max: 500,
     },
     comments: {
-        type: Array,
-        default: [],
+        type: Object,
+        default: {comment:{type: String, required: true}, done_by:{type: String, required: true}},
     },
     likes: {
       type: Array,
